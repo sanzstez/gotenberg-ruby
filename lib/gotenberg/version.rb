@@ -1,0 +1,3 @@
+module Gotenberg
+  VERSION = '1.0.0'
+end
