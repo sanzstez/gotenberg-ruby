@@ -1,3 +1,5 @@
 require 'gotenberg/version'
 
-module Gotenberg; end
+module Gotenberg
+  autoload :Chromium, 'gotenberg/chromium'
+end
