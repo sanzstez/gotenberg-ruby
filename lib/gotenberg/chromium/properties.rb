@@ -24,11 +24,11 @@ module Gotenberg
       end
 
       # Overrides the default margins (i.e., 0.39), in inches.
-      def margins top, bottom, left, right
-        properties['marginTop'] = top
-        properties['marginBottom'] = bottom
-        properties['marginLeft'] = left
-        properties['marginRight'] = right
+      def margins top: nil, bottom: nil, left: nil, right: nil
+        properties['marginTop'] = top if top
+        properties['marginBottom'] = bottom if bottom
+        properties['marginLeft'] = left if left
+        properties['marginRight'] = right if right
 
         self
       end

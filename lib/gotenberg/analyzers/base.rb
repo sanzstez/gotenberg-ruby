@@ -22,25 +22,29 @@ module Gotenberg
         @binary ||= remote? ? remote_source : local_source
       end
 
-      def filename
-        File.basename(path)
-      end
-
       def remote_source
-        Faraday.get(path).body
+        Faraday.get(src).body
       rescue StandardError => e
         raise 'Unable to load remote source. %s' % e.message
       end
 
       def local_source
-        IO.binread(path)
+        IO.binread(src)
+      end
+
+      def extension
+        @extension ||= File.extname(filename).strip.downcase[1..-1]
+      end
+
+      def filename
+        @filename ||= File.basename(src)
       end
 
       def remote?
-        path.match?(URI_REGEXP)
+        src.match?(URI_REGEXP)
       end
 
-      def path
+      def src
         resource[:src]
       end
     end

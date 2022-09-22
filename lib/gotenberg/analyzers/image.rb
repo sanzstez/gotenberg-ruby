@@ -33,7 +33,7 @@ module Gotenberg
       end
 
       def mimetype
-        MIME_TYPES[File.extname(path).strip.downcase[1..-1]] || 'application/octet-stream'
+        MIME_TYPES[extension] || 'application/octet-stream'
       end
     end
   end

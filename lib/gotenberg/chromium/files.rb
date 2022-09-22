@@ -10,7 +10,7 @@ module Gotenberg
       def header header
         compiler = Compiler.new(header)
 
-        File.open('header.html', 'w') { |f| f.write(compiler.body) }
+        #File.open('header.html', 'w') { |f| f.write(compiler.body) }
 
         files << multipart_file(compiler.body, 'header.html', 'text/html')
       end
@@ -20,7 +20,7 @@ module Gotenberg
       def footer footer
         compiler = Compiler.new(footer)
 
-        File.open('footer.html', 'w') { |f| f.write(compiler.body) }
+        #File.open('footer.html', 'w') { |f| f.write(compiler.body) }
 
         files << multipart_file(compiler.body, 'footer.html', 'text/html')
       end
@@ -37,7 +37,7 @@ module Gotenberg
 
         binary_assets(compiler.assets)
 
-        File.open('index.html', 'w') { |f| f.write(compiler.body) }
+        #File.open('index.html', 'w') { |f| f.write(compiler.body) }
 
         @endpoint = '/forms/chromium/convert/html'
 
