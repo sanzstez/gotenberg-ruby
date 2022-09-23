@@ -22,8 +22,6 @@ gem "gotenberg-ruby"
 
 * [Send a request to the API](#send-a-request-to-the-api)
 * [Chromium](#chromium)
-* [PDF Engines](#pdf-engines)
-* [Webhook](#webhook)
 
 ### Send a request to the API
 
