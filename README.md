@@ -22,7 +22,6 @@ gem "gotenberg-ruby"
 
 * [Send a request to the API](#send-a-request-to-the-api)
 * [Chromium](#chromium)
-* [LibreOffice](#libreOffice)
 * [PDF Engines](#pdf-engines)
 * [Webhook](#webhook)
 
@@ -51,6 +50,37 @@ document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
 end
 ```
 
+#### Usage:
+
+```ruby
+# generate pdf output binary data or raise method exception
+pdf = document.to_binary
+
+# safe check if pdf generate is success
+success = document.success?
+
+# fetch exception data
+error_message = document.exception.message
+
+# save PDF file
+File.open('filename.pdf', 'wb') do |file|
+  file << document.to_binary
+end
+```
+
+Available exceptions:
+
+```ruby
+# raise while PDF transform failed
+Gotenberg::TransformError
+
+# raise while change PDF metadata failed
+Gotenberg::ModifyMetadataError
+
+# raise while loading asset source failed
+Gotenberg::RemoteSourceError
+```
+
 You may inject `<link>` and `<script>` HTML elements thanks to the `extra_link_tags` and `extra_script_tags` arguments:
 
 ```ruby
@@ -61,9 +91,42 @@ end
 
 Please note that Gotenberg will add the `<link>` and `<script>` elements based on the order of the arguments.
 
+#### Rails integrations
+
+For rails apps gem provide few helpful helpers for easier access to assets inside your rails app:
+
+```ruby
+# read from assets pipeline or webpacker
+gotenberg_image_tag 'logo.svg'
+
+# read from absolute file path (use with carefully for security reasons)
+gotenberg_image_tag 'app/assets/images/logo.svg', absolute_path: true
+
+# also you can encode you source as base64 data resource (useful for header and footer)
+gotenberg_image_tag 'app/assets/images/logo.svg', absolute_path: true, inline: true
+
+# same methods available for js
+gotenberg_javascript_tag 'application.js', inline: true
+
+# ... and css. 
+gotenberg_stylesheet_tag 'application.css', inline: true
+```
+
+⚠️ Warning! Nested resources for CSS is not supported yet.
+
 #### Convert an HTML document to PDF
 
 See https://gotenberg.dev/docs/modules/chromium#html.
+
+Prepare HTML content with build-in Rails methods:
+
+```ruby
+# declare HTML renderer
+renderer = ApplicationController.renderer.new(https: true, http_host: 'localhost:3000')
+
+# render HTML string for passing into service
+index_html = renderer.render 'pdf/document', layout: 'pdf', locals: {}
+```
 
 You may convert an HTML document string with:
 

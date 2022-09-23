@@ -5,6 +5,7 @@ require 'gotenberg/chromium/metadata'
 require 'gotenberg/client'
 require 'gotenberg/exiftools'
 require 'gotenberg/extractors'
+require 'gotenberg/exceptions'
 
 module Gotenberg
   class Chromium
@@ -36,11 +37,11 @@ module Gotenberg
     end
 
     def success?
-      @exception == nil
+      exception == nil
     end
 
     def to_binary
-      response
+      response || raise(exception)
     end
 
     private
@@ -48,13 +49,13 @@ module Gotenberg
     def transform
       @response = client.adapter.post(endpoint, properties.merge(files: files), headers).body
     rescue StandardError => e
-      @exception = e
+      @exception = Gotenberg::TransformError.new(e)
     end
 
     def modify_metadata
       @response = Exiftools.modify(response, metadata)
     rescue StandardError => e
-      @exception = e
+      @exception = Gotenberg::ModifyMetadataError.new(e)
     end
 
     def client

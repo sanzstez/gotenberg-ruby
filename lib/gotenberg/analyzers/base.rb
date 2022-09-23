@@ -1,5 +1,6 @@
 require 'faraday'
 require 'base64'
+require 'gotenberg/exceptions'
 
 module Gotenberg
   module Analyzers
@@ -25,7 +26,7 @@ module Gotenberg
       def remote_source
         Faraday.get(src).body
       rescue StandardError => e
-        raise 'Unable to load remote source. %s' % e.message
+        raise RemoteSourceError.new('Unable to load remote source. %s' % e.message)
       end
 
       def local_source
