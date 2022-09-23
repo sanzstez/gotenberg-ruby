@@ -129,7 +129,7 @@ module Gotenberg
         properties['extraLinkTags'] = links.to_json
         properties['extraScriptTags'] = scripts.to_json
 
-        endpoint = '/forms/chromium/convert/url' 
+        @endpoint = '/forms/chromium/convert/url'
 
         self
       end
