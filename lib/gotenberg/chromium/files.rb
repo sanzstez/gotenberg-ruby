@@ -10,8 +10,6 @@ module Gotenberg
       def header header
         compiler = Compiler.new(header)
 
-        #File.open('header.html', 'w') { |f| f.write(compiler.body) }
-
         files << multipart_file(compiler.body, 'header.html', 'text/html')
       end
 
@@ -19,8 +17,6 @@ module Gotenberg
       # Note: it automatically sets the filename to "footer.html", as required by Gotenberg.
       def footer footer
         compiler = Compiler.new(footer)
-
-        #File.open('footer.html', 'w') { |f| f.write(compiler.body) }
 
         files << multipart_file(compiler.body, 'footer.html', 'text/html')
       end
@@ -36,8 +32,6 @@ module Gotenberg
         files << multipart_file(compiler.body, 'index.html', 'text/html')
 
         binary_assets(compiler.assets)
-
-        #File.open('index.html', 'w') { |f| f.write(compiler.body) }
 
         @endpoint = '/forms/chromium/convert/html'
 
@@ -60,16 +54,16 @@ module Gotenberg
       end
 
       # Sets the additional files, like images, fonts, stylesheets, and so on.
-      def binary_assets assets
-        assets.each do |(io, filename)|
+      def binary_assets sources
+        sources.each do |(io, filename)|
           files << multipart_file(io, filename)
         end
 
         self
       end
 
-      def assets assets
-        assets.each do |f|
+      def assets sources
+        sources.each do |f|
           files << multipart_file(IO.binread(f), File.basename(f))
         end
 

@@ -6,6 +6,7 @@ require 'gotenberg/client'
 require 'gotenberg/exiftools'
 require 'gotenberg/extractors'
 require 'gotenberg/exceptions'
+require 'gotenberg/backtrace'
 
 module Gotenberg
   class Chromium
@@ -27,6 +28,7 @@ module Gotenberg
     end
 
     def call
+      backtrace if html_debug?
       transform
 
       if success? && metadata_available? 
@@ -44,7 +46,15 @@ module Gotenberg
       response || raise(exception)
     end
 
+    def html_debug?
+      Gotenberg.configuration.html_debug == true
+    end
+
     private
+
+    def backtrace
+      Backtrace.new(files).call
+    end
 
     def transform
       @response = client.adapter.post(endpoint, properties.merge(files: files), headers).body
@@ -59,7 +69,7 @@ module Gotenberg
     end
 
     def client
-      @client ||= Client.new(base_path)
+      Client.new(base_path)
     end
   end
 end

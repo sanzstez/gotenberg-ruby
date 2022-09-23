@@ -146,6 +146,38 @@ document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
 end
 ```
 
+#### Change PDF meta with exiftools
+
+If you want to use this feature, you need to install additional package to host system:
+
+```
+sudo apt install exiftool
+```
+
+You can change PDF metatags using exiftools:
+
+```ruby
+document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.html index_html
+  doc.meta title: 'Custom PDF title'
+end
+```
+
+#### Configuration file (optionally)
+
+```ruby
+Gotenberg.configure do |config|
+  # activate HTML debug mode
+  config.html_debug = false
+
+  # default temporary directory for output
+  config.backtrace_dir = Rails.root.join('tmp', 'gotenberg')
+end
+```
+
+Note: for Rails based apps, you can setup <title>Custom PDF title</title> header in index.html and
+it will be automatically added to output PDF.
+
 #### Convert one or more markdown files to PDF
 
 See https://gotenberg.dev/docs/modules/chromium#markdown.
