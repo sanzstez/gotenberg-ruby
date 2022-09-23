@@ -392,7 +392,7 @@ You may also wait until a given JavaScript expression returns true:
 ```ruby
 document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
   doc.html index_html
-  doc.wait_for_expression("window.status === 'ready'")
+  doc.wait_for_expression "window.status === 'ready'"
 end
 ```
 
