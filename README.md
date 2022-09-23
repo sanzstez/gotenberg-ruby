@@ -23,6 +23,21 @@ gem "gotenberg-ruby"
 * [Send a request to the API](#send-a-request-to-the-api)
 * [Chromium](#chromium)
 
+### Run Gotenberg
+
+Run microservice with docker-compose:
+
+```
+version: "3"
+
+services:
+  gotenberg:
+    image: gotenberg/gotenberg:7
+    restart: always
+    ports:
+      - 3000:3000
+```
+
 ### Send a request to the API
 
 After having created the HTTP request (see below), you have two options:
