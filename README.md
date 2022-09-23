@@ -154,7 +154,7 @@ If you want to use this feature, you need to install additional package to host 
 sudo apt install exiftool
 ```
 
-You can change PDF metatags using exiftools:
+ and now you can change PDF metatags using exiftools:
 
 ```ruby
 document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
@@ -162,6 +162,9 @@ document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
   doc.meta title: 'Custom PDF title'
 end
 ```
+
+Note: for Rails based apps, you can setup <title>Custom PDF title</title> header in index.html and
+it will be automatically added to output PDF.
 
 #### Configuration file (optionally)
 
@@ -174,9 +177,6 @@ Gotenberg.configure do |config|
   config.backtrace_dir = Rails.root.join('tmp', 'gotenberg')
 end
 ```
-
-Note: for Rails based apps, you can setup <title>Custom PDF title</title> header in index.html and
-it will be automatically added to output PDF.
 
 #### Convert one or more markdown files to PDF
 
