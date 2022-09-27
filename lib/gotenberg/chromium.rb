@@ -31,8 +31,8 @@ module Gotenberg
       backtrace if html_debug?
       transform
 
-      if success? && metadata_available?
-        modify_metadata
+      unless webhook_request?
+        modify_metadata if success? && metadata_available?
       end
 
       self

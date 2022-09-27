@@ -42,8 +42,12 @@ module Gotenberg
         self
       end
 
+      def webhook_request?
+        headers.keys.include?('Gotenberg-Webhook-Url')
+      end
+
       def headers
-        @headers = {}
+        @headers ||= {}
       end
     end
   end

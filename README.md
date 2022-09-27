@@ -22,6 +22,7 @@ gem "gotenberg-ruby"
 
 * [Send a request to the API](#send-a-request-to-the-api)
 * [Chromium](#chromium)
+* [Webhook](#webhook)
 
 ### Run Gotenberg
 
@@ -419,10 +420,7 @@ You may add HTTP headers that Chromium will send when loading the HTML document:
 ```ruby
 document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
   doc.url 'https://my.url'
-  doc.extra_http_headers [
-    'My-Header-1' => 'My value',
-    'My-Header-2' => 'My value'
-  ]
+  doc.extra_http_headers({'My-Header-1' => 'My value', 'My-Header-2' => 'My value'})
 end
 ```
 
@@ -459,5 +457,42 @@ You may set the PDF format of the resulting PDF with:
 document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
   doc.url 'https://my.url'
   doc.pdf_format 'PDF/A-1a'
+end
+```
+
+### Webhook
+
+The [Webhook module](https://gotenberg.dev/docs/modules/webhook) is a Gotenberg middleware that sends the API
+responses to callbacks.
+
+⚠️ You cannot use the `document.to_binary` method if you're using the webhook feature.
+
+For instance:
+
+```ruby
+document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.url 'https://my.url'
+  doc.webhook 'https://my.webhook.url', 'https://my.webhook.error.url'
+end
+```
+
+You may also override the default HTTP method (`POST`) that Gotenberg will use to call the webhooks:
+
+```ruby
+document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.url 'https://my.url'
+  doc.webhook_method('PATCH')
+  doc.webhook_error_method('PUT')
+  doc.webhook 'https://my.webhook.url', 'https://my.webhook.error.url'
+end
+```
+
+You may also tell Gotenberg to add extra HTTP headers that it will send alongside the request to the webhooks:
+
+```ruby
+document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.url 'https://my.url'
+  doc.webhook_extra_http_headers({'My-Header-1' => 'My value', 'My-Header-2' => 'My value'})
+  doc.webhook 'https://my.webhook.url', 'https://my.webhook.error.url'
 end
 ```
