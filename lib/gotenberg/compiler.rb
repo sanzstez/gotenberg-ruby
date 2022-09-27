@@ -30,26 +30,16 @@ module Gotenberg
         analyzer = 
           case resource[:tag]
           when 'image'
-            Analyzers::Image.new(resource)
+            Analyzers::Image.new(resource).call
           when 'js'
-            Analyzers::Js.new(resource)
+            Analyzers::Js.new(resource).call
           when 'css'
-            Analyzers::Css.new(resource)
+            Analyzers::Css.new(resource).call
           end
 
-        assets << analyzer.assets
+        assets.push(*analyzer.assets)
 
         analyzer.tag
-
-        #css - 
-        #  1) read to io (http or file)
-        #  2) scan for url tags -
-        #    if data - skip
-        #    if relative (read to io http or file )
-        #    replace url tags
-        #  3) check if inline then stylesheet tag
-        #  4) if not inline add to assets
-        #  5) replace tag
       end
     end
   end

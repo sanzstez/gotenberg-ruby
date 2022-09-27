@@ -125,7 +125,12 @@ gotenberg_javascript_tag 'application.js', inline: true
 gotenberg_stylesheet_tag 'application.css', inline: true
 ```
 
-⚠️ Warning! Nested resources for CSS is not supported yet.
+⚠️ Gem also supported extracting CSS nested resources defined with url() in experimentally mode.
+
+```ruby
+# skip nested resources auto extracting
+gotenberg_stylesheet_tag 'application.css', inline: true, skip_analyze: true
+```
 
 #### Convert an HTML document to PDF
 

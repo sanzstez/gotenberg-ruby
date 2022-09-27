@@ -1,5 +1,6 @@
-require 'faraday'
 require 'base64'
+require 'net/http'
+require 'uri'
 require 'gotenberg/exceptions'
 
 module Gotenberg
@@ -13,6 +14,10 @@ module Gotenberg
         @resource = resource
       end
 
+      def call
+        self
+      end
+
       def assets
         [binary, filename]
       end
@@ -20,25 +25,11 @@ module Gotenberg
       private
 
       def binary
-        @binary ||= remote? ? remote_source : local_source
-      end
-
-      def remote_source
-        Faraday.get(src).body
-      rescue StandardError => e
-        raise RemoteSourceError.new('Unable to load remote source. %s' % e.message)
-      end
-
-      def local_source
-        IO.binread(src)
-      end
-
-      def extension
-        @extension ||= File.extname(filename).strip.downcase[1..-1]
+        @binary ||= remote? ? remote_source(src) : local_source(src)
       end
 
       def filename
-        @filename ||= File.basename(src)
+        @filename ||= URI(File.basename(src)).path
       end
 
       def remote?
@@ -47,6 +38,16 @@ module Gotenberg
 
       def src
         resource[:src]
+      end
+
+      def local_source path
+        IO.binread(path)
+      end
+
+      def remote_source url
+        Net::HTTP.get_response(URI(url)).body
+      rescue StandardError => e
+        raise RemoteSourceError.new('Unable to load remote source. %s' % e.message)
       end
     end
   end

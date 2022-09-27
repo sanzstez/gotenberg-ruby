@@ -3,9 +3,9 @@ require 'gotenberg/utilities/inline_resource'
 
 module Gotenberg
   module Analyzers
-    class Image < Base
+    class Resource < Base
       def tag
-        '<img src="%s" alt="%s" />' % [src_value, filename]
+        'url(%s)' % src_value
       end
 
       private

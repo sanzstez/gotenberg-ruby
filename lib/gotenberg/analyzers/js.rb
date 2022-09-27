@@ -1,4 +1,3 @@
-require 'faraday'
 require 'base64'
 require 'gotenberg/analyzers/base'
 
