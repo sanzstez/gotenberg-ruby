@@ -4,6 +4,7 @@ require 'gotenberg/railtie' if defined?(Rails::Railtie)
 module Gotenberg
   autoload :Chromium, 'gotenberg/chromium'
   autoload :Libreoffice, 'gotenberg/libreoffice'
+  autoload :PdfEngines, 'gotenberg/pdf_engines'
   autoload :Configuration, 'gotenberg/configuration'
 
   def self.configuration

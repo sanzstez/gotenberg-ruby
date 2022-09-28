@@ -23,6 +23,7 @@ gem "gotenberg-ruby"
 * [Send a request to the API](#send-a-request-to-the-api)
 * [Chromium](#chromium)
 * [LibreOffice](#libreOffice)
+* [PDF Engines](#pdf-engines)
 * [Webhook](#webhook)
 
 ### Run Gotenberg
@@ -549,6 +550,59 @@ end
 ```
 
 ⚠️ You cannot set both property, otherwise Gotenberg will return `400 Bad Request` response.
+
+
+### PDF Engines
+
+The [PDF Engines module](https://gotenberg.dev/docs/modules/pdf-engines) gathers all engines that can manipulate PDF files.
+
+#### Merge PDFs
+
+See https://gotenberg.dev/docs/modules/pdf-engines#merge.
+
+Merging PDFs is as simple as:
+
+```ruby
+document = Gotenberg::PdfEngines.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.merge '/path/to/my.pdf', '/path/to/my2.pdf'
+end
+```
+
+Please note that the merging order is determined by the order of the arguments.
+
+You may also set the PDF format of the resulting PDF(s) with:
+
+```ruby
+document = Gotenberg::PdfEngines.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.pdf_format 'PDF/A-1a'
+  doc.merge '/path/to/my.pdf', '/path/to/my2.pdf', '/path/to/my3.pdf'
+end
+```
+
+#### Convert to a specific PDF format
+
+See https://gotenberg.dev/docs/modules/pdf-engines#convert.
+
+You may convert a PDF to a specific PDF format with:
+
+```ruby
+document = Gotenberg::PdfEngines.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.convert 'PDF/A-1a', '/path/to/my.pdf'
+end
+```
+
+If you send many PDFs, Gotenberg will return a ZIP archive with the PDFs:
+
+```ruby
+document = Gotenberg::PdfEngines.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.convert 'PDF/A-1a', '/path/to/my.pdf', '/path/to/my2.pdf', '/path/to/my3.pdf'
+end
+
+# will return binary data with zip archive content
+File.open('archive.zip', 'wb') do |file|
+  file << document.to_binary
+end
+```
 
 ### Webhook
 
