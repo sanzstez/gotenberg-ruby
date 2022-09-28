@@ -22,6 +22,7 @@ gem "gotenberg-ruby"
 
 * [Send a request to the API](#send-a-request-to-the-api)
 * [Chromium](#chromium)
+* [LibreOffice](#libreOffice)
 * [Webhook](#webhook)
 
 ### Run Gotenberg
@@ -459,6 +460,95 @@ document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
   doc.pdf_format 'PDF/A-1a'
 end
 ```
+
+### LibreOffice
+
+The [LibreOffice module](https://gotenberg.dev/docs/modules/libreoffice) interacts with [LibreOffice](https://www.libreoffice.org/) 
+to convert documents to PDF, thanks to [unoconv](https://github.com/unoconv/unoconv).
+
+#### Convert documents to PDF
+
+See https://gotenberg.dev/docs/modules/libreoffice#route.
+
+Converting a document to PDF is as simple as:
+
+```ruby
+document = Gotenberg::Libreoffice.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.convert '/path/to/my.docx'
+end
+```
+
+If you send many documents, Gotenberg will return a ZIP archive with the PDFs:
+
+```ruby
+document = Gotenberg::Libreoffice.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.convert '/path/to/my.docx', '/path/to/my.xlsx'
+end
+
+# will return binary data with zip archive content
+File.open('archive.zip', 'wb') do |file|
+  file << document.to_binary
+end
+```
+
+You may also merge them into one unique PDF:
+
+```ruby
+document = Gotenberg::Libreoffice.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.merge
+  doc.convert '/path/to/my.docx', '/path/to/my.xlsx'
+end
+```
+
+Please note that the merging order is determined by the order of the arguments.
+
+#### Landscape orientation
+
+You may override the default portrait orientation with:
+
+```ruby
+document = Gotenberg::Libreoffice.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.landscape
+  doc.convert '/path/to/my.docx'
+end
+```
+
+#### Page ranges
+
+You may set the page ranges to print, e.g., `1-4`. Empty means all pages.
+
+```ruby
+document = Gotenberg::Libreoffice.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.native_page_ranges '1-2'
+  doc.convert '/path/to/my.docx'
+end
+```
+
+⚠️ The page ranges are applied to all files independently.
+
+#### PDF format
+
+See https://gotenberg.dev/docs/modules/pdf-engines#engines.
+
+You may set the PDF format of the resulting PDF(s) with:
+
+```ruby
+document = Gotenberg::Libreoffice.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.pdf_format 'PDF/A-1a'
+  doc.convert '/path/to/my.docx'
+end
+```
+
+You may also explicitly tell Gotenberg to use [unoconv](https://github.com/unoconv/unoconv) to convert the resulting PDF(s) to a PDF format:
+
+```ruby
+document = Gotenberg::Libreoffice.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.native_pdf_format 'PDF/A-1a'
+  doc.convert '/path/to/my.docx'
+end
+```
+
+⚠️ You cannot set both property, otherwise Gotenberg will return `400 Bad Request` response.
 
 ### Webhook
 

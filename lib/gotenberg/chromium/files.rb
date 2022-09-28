@@ -11,6 +11,8 @@ module Gotenberg
         compiler = Compiler.new(header)
 
         files << multipart_file(compiler.body, 'header.html', 'text/html')
+
+        self
       end
 
       # Adds a footer to each page.
@@ -19,6 +21,8 @@ module Gotenberg
         compiler = Compiler.new(footer)
 
         files << multipart_file(compiler.body, 'footer.html', 'text/html')
+
+        self
       end
 
       # Converts an HTML document to PDF.
@@ -70,11 +74,11 @@ module Gotenberg
         self
       end
 
+      private
+
       def files
         @files ||= []
       end
-
-      private
 
       def multipart_file body, filename, content_type = 'application/octet-stream'
         Faraday::Multipart::FilePart.new(StringIO.new(body), content_type, filename)

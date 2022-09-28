@@ -133,6 +133,8 @@ module Gotenberg
 
         self
       end
+
+      private
  
       def properties
         @properties ||= {}

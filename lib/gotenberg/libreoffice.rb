@@ -1,16 +1,14 @@
-require 'gotenberg/chromium/properties'
-require 'gotenberg/chromium/files'
+require 'gotenberg/libreoffice/properties'
+require 'gotenberg/libreoffice/files'
 require 'gotenberg/headers'
 require 'gotenberg/metadata'
 require 'gotenberg/client'
 require 'gotenberg/exiftools'
-require 'gotenberg/extractors'
 require 'gotenberg/exceptions'
-require 'gotenberg/backtrace'
 
 module Gotenberg
-  class Chromium
-    include Properties, Files, Headers, Metadata, Extractors
+  class Libreoffice
+    include Properties, Files, Headers, Metadata
 
     attr_accessor :base_path
     attr_reader :endpoint, :response, :exception
@@ -28,7 +26,6 @@ module Gotenberg
     end
 
     def call
-      backtrace if html_debug?
       transform
       modify_metadata if modify_metadata?
 
@@ -43,21 +40,13 @@ module Gotenberg
       response || raise(exception)
     end
 
-
     private
 
     def modify_metadata?
       return false if webhook_request?
+      return false if zip_mode?
 
       success? && metadata_available?
-    end
-
-    def html_debug?
-      Gotenberg.configuration.html_debug == true
-    end
-
-    def backtrace
-      Backtrace.new(files).call
     end
 
     def transform
