@@ -43,7 +43,6 @@ module Gotenberg
       response || raise(exception)
     end
 
-
     private
 
     def modify_metadata?

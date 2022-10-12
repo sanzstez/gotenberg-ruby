@@ -25,6 +25,7 @@ gem "gotenberg-ruby"
 * [LibreOffice](#libreOffice)
 * [PDF Engines](#pdf-engines)
 * [Webhook](#webhook)
+* [Exiftools](#exiftools)
 
 ### Run Gotenberg
 
@@ -640,3 +641,19 @@ document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
   doc.webhook 'https://my.webhook.url', 'https://my.webhook.error.url'
 end
 ```
+
+### Exiftools
+
+Gem also proxify (expert mode) access to mini_exiftools througth *Gotenberg::Exiftools* class.
+You can change PDF metadata manually:
+
+```ruby
+binary = Gotenberg::Exiftools.modify(pdf_binary, { title: 'Document 1' })
+
+# save PDF file
+File.open('filename.pdf', 'wb') do |file|
+  file << binary
+end
+```
+
+⚠️ Class is just wrapper around *MiniExiftool* class, so you need handle exceptions manually/carefully in begin/rescue block.

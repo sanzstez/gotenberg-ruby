@@ -5,6 +5,7 @@ module Gotenberg
   autoload :Chromium, 'gotenberg/chromium'
   autoload :Libreoffice, 'gotenberg/libreoffice'
   autoload :PdfEngines, 'gotenberg/pdf_engines'
+  autoload :Exiftools, 'gotenberg/exiftools'
   autoload :Configuration, 'gotenberg/configuration'
 
   def self.configuration
