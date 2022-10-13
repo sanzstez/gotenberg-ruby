@@ -33,8 +33,6 @@ module Gotenberg
       transform
       modify_metadata if modify_metadata?
 
-      puts files.inspect
-
       self
     end
 
