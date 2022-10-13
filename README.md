@@ -164,7 +164,7 @@ in the HTML DOM are on the root level.
 ```ruby
 document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
   doc.html index_html
-  doc.assets ['/path/to/my.css', '/path/to/my.js']
+  doc.assets '/path/to/my.css', '/path/to/my.js', ['<binary string>', 'my.png']
 end
 ```
 
@@ -208,7 +208,15 @@ You may convert markdown files with:
 
 ```ruby
 document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
-  doc.markdown wrapper_html, ['/path/to/file.md']
+  doc.markdown wrapper_html, '/path/to/file.md'
+end
+```
+
+Or with raw input:
+
+```ruby
+document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.markdown wrapper_html, ['<binary data>', 'file.md']
 end
 ```
 
@@ -234,8 +242,8 @@ requirement is that their paths in the HTML DOM are on the root level.
 
 ```ruby
 document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
-  doc.markdown wrapper_html, ['/path/to/file.md', '/path/to/my2.md']
-  doc.assets ['/path/to/my.css', '/path/to/my.js']
+  doc.markdown wrapper_html, '/path/to/file.md'
+  doc.assets '/path/to/my.css', '/path/to/my.js', '/path/to/my2.md', ['<binary data>', 'file_2.md']
 end
 ```
 
@@ -484,7 +492,7 @@ If you send many documents, Gotenberg will return a ZIP archive with the PDFs:
 
 ```ruby
 document = Gotenberg::Libreoffice.call(ENV['GOTENBERG_URL']) do |doc|
-  doc.convert '/path/to/my.docx', '/path/to/my.xlsx'
+  doc.convert '/path/to/my.docx', '/path/to/my.xlsx', ['<binary data>', 'some.odt']
 end
 
 # will return binary data with zip archive content
@@ -498,7 +506,7 @@ You may also merge them into one unique PDF:
 ```ruby
 document = Gotenberg::Libreoffice.call(ENV['GOTENBERG_URL']) do |doc|
   doc.merge
-  doc.convert '/path/to/my.docx', '/path/to/my.xlsx'
+  doc.convert '/path/to/my.docx', '/path/to/my.xlsx', ['<binary data>', 'some.odt']
 end
 ```
 
@@ -565,7 +573,7 @@ Merging PDFs is as simple as:
 
 ```ruby
 document = Gotenberg::PdfEngines.call(ENV['GOTENBERG_URL']) do |doc|
-  doc.merge '/path/to/my.pdf', '/path/to/my2.pdf'
+  doc.merge '/path/to/my.pdf', '/path/to/my2.pdf', ['<binary data>', 'some.pdf']
 end
 ```
 
@@ -588,7 +596,7 @@ You may convert a PDF to a specific PDF format with:
 
 ```ruby
 document = Gotenberg::PdfEngines.call(ENV['GOTENBERG_URL']) do |doc|
-  doc.convert 'PDF/A-1a', '/path/to/my.pdf'
+  doc.convert '/path/to/my.pdf', format: 'PDF/A-1a'
 end
 ```
 
@@ -596,7 +604,7 @@ If you send many PDFs, Gotenberg will return a ZIP archive with the PDFs:
 
 ```ruby
 document = Gotenberg::PdfEngines.call(ENV['GOTENBERG_URL']) do |doc|
-  doc.convert 'PDF/A-1a', '/path/to/my.pdf', '/path/to/my2.pdf', '/path/to/my3.pdf'
+  doc.convert '/path/to/my.pdf', '/path/to/my2.pdf', '/path/to/my3.pdf', ['<binary data>', 'some.pdf'], format: 'PDF/A-1a'
 end
 
 # will return binary data with zip archive content

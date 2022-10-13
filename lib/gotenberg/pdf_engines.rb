@@ -1,14 +1,15 @@
 require 'gotenberg/pdf_engines/properties'
-require 'gotenberg/pdf_engines/files'
+require 'gotenberg/pdf_engines/tools'
 require 'gotenberg/headers'
 require 'gotenberg/metadata'
+require 'gotenberg/files'
 require 'gotenberg/client'
 require 'gotenberg/exiftools'
 require 'gotenberg/exceptions'
 
 module Gotenberg
   class PdfEngines
-    include Properties, Files, Headers, Metadata
+    include Properties, Files, Headers, Metadata, Tools
 
     attr_accessor :base_path
     attr_reader :endpoint, :response, :exception

@@ -1,7 +1,8 @@
 require 'gotenberg/chromium/properties'
-require 'gotenberg/chromium/files'
+require 'gotenberg/chromium/tools'
 require 'gotenberg/headers'
 require 'gotenberg/metadata'
+require 'gotenberg/files'
 require 'gotenberg/client'
 require 'gotenberg/exiftools'
 require 'gotenberg/extractors'
@@ -10,7 +11,7 @@ require 'gotenberg/backtrace'
 
 module Gotenberg
   class Chromium
-    include Properties, Files, Headers, Metadata, Extractors
+    include Properties, Files, Headers, Metadata, Tools, Extractors
 
     attr_accessor :base_path
     attr_reader :endpoint, :response, :exception
@@ -31,6 +32,8 @@ module Gotenberg
       backtrace if html_debug?
       transform
       modify_metadata if modify_metadata?
+
+      puts files.inspect
 
       self
     end

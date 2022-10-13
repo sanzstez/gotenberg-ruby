@@ -1,10 +1,8 @@
-require 'faraday'
-require 'faraday/multipart'
 require 'gotenberg/utilities/index'
 
 module Gotenberg
   class Libreoffice
-    module Files
+    module Tools
 
      # Converts the given document(s) to PDF(s).
      # Gotenberg will return either a unique PDF if you request a merge or a ZIP archive with the PDFs.
@@ -12,7 +10,9 @@ module Gotenberg
      # See https://gotenberg.dev/docs/modules/libreoffice#route.
       def convert *sources
         sources.each.with_index(1) do |source, index|
-          files << multipart_file(IO.binread(source), merge_prefix(index) + File.basename(source))
+          io, filename = load_file_from_source(source)
+
+          files << multipart_file(io, merge_prefix(index) + filename)
         end
 
         @endpoint = '/forms/libreoffice/convert'
@@ -22,20 +22,12 @@ module Gotenberg
 
       private
 
-      def files
-        @files ||= []
-      end
-
       def zip_mode?
         properties['merge'] != true && files.size > 1
       end
 
       def merge_prefix number
         properties['merge'] ? Gotenberg::Utilities::Index::to_alpha(number) + '_' : ''
-      end
-
-      def multipart_file body, filename, content_type = 'application/octet-stream'
-        Faraday::Multipart::FilePart.new(StringIO.new(body), content_type, filename)
       end
     end
   end
