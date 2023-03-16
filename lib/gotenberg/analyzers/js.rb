@@ -11,6 +11,10 @@ module Gotenberg
           '<script src="%s"></script>' % filename
         end
       end
+
+      def assets
+        @assets ||= [[binary, filename]]
+      end
     end
   end
 end
