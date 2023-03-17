@@ -8,6 +8,10 @@ module Gotenberg
         '<img src="%s" alt="%s" />' % [src_value, filename]
       end
 
+      def assets
+        @assets ||= [[binary, filename]]
+      end
+
       private
 
       def src_value

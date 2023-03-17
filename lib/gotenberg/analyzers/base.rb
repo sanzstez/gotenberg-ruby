@@ -18,10 +18,6 @@ module Gotenberg
         self
       end
 
-      def assets
-        [binary, filename]
-      end
-
       private
 
       def binary

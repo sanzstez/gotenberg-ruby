@@ -8,6 +8,10 @@ module Gotenberg
         'url(%s)' % src_value
       end
 
+      def assets
+        [binary, filename]
+      end
+
       private
 
       def src_value
