@@ -385,7 +385,7 @@ The following classes allow you to inject printing values:
 * No JavaScript.
 * The CSS properties are independent of the ones from the HTML document.
 * The footer CSS properties override the ones from the header;
-* Only fonts installed in the Docker image are loaded - see the [Fonts chapter](https://gotenberg.dev/docs/customize/fonts).
+* Only fonts installed in the Docker image are loaded - see the [Fonts chapter](https://gotenberg.dev/docs/configuration#fonts).
 * Images only work using a base64 encoded source - i.e., `data:image/png;base64, iVBORw0K....`
 * `background-color` and color `CSS` properties require an additional `-webkit-print-color-adjust: exact` CSS property in order to work.
 * Assets are not loaded (i.e., CSS files, scripts, fonts, etc.).
