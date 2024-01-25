@@ -82,7 +82,7 @@ module Gotenberg
 
         self
       end
- 
+
       # Overrides the default "User-Agent" header.
       def user_agent user_agent
         properties['userAgent'] = user_agent
@@ -91,8 +91,10 @@ module Gotenberg
       end
 
       # Sets extra HTTP headers that Chromium will send when loading the HTML document.
-      def extra_http_headers headers
-        properties['userAgent'] = headers.to_json
+      def extra_http_headers extra_headers
+        extra_headers.each do |key, value|
+          headers[key] = value.to_s
+        end
 
         self
       end
@@ -103,7 +105,7 @@ module Gotenberg
 
         self
       end
- 
+
       # Forces Chromium to emulate the media type "print" or "screen".
       def emulate_media_type type
         properties['emulatedMediaType'] = type
@@ -135,7 +137,7 @@ module Gotenberg
       end
 
       private
- 
+
       def properties
         @properties ||= {}
       end
