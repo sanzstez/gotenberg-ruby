@@ -28,8 +28,8 @@ module Gotenberg
     end
 
     # Sets the extra HTTP headers that Gotenberg will send alongside the request to the webhook and error webhook.
-    def webhook_extra_http_headers headers
-      headers['Gotenberg-Webhook-Extra-Http-Headers'] = headers.to_json
+    def webhook_extra_http_headers extra_headers
+      headers['Gotenberg-Webhook-Extra-Http-Headers'] = extra_headers.to_json
 
       self
     end
@@ -37,6 +37,13 @@ module Gotenberg
     # Overrides the default UUID trace, or request ID, that identifies a request in Gotenberg's logs.
     def trace trace, header = 'Gotenberg-Trace'
       headers[header] = trace
+
+      self
+    end
+
+    # Sets the extra HTTP headers for faraday client to make request to gotenberg instance
+    def client_extra_http_headers extra_headers
+      headers.merge!(extra_headers)
 
       self
     end
