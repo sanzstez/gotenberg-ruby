@@ -11,11 +11,11 @@ module Gotenberg
   class Libreoffice
     include Properties, Files, Headers, Metadata, Tools
 
-    attr_accessor :base_path
+    attr_accessor :base_path, :client_headers
     attr_reader :endpoint, :response, :exception
     
-    def self.call(base_path, &block)
-      new(base_path: base_path, &block).call
+    def self.call(base_path, headers: {}, &block)
+      new(base_path: base_path, client_headers: headers, &block).call
     end
 
     def initialize args
@@ -63,7 +63,7 @@ module Gotenberg
     end
 
     def client
-      Client.new(base_path)
+      Client.new(base_path, headers: client_headers)
     end
   end
 end

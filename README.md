@@ -36,7 +36,7 @@ version: "3"
 
 services:
   gotenberg:
-    image: gotenberg/gotenberg:7
+    image: gotenberg/gotenberg:8
     restart: always
     ports:
       - 3000:3000
@@ -82,6 +82,14 @@ error_message = document.exception.message
 # save PDF file
 File.open('filename.pdf', 'wb') do |file|
   file << document.to_binary
+end
+```
+
+Pass additional headers for faraday client instance (Authorization, User-Agent, etc.):
+
+```ruby
+document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL'], headers: { 'Authorization': 'Bearer token123' }) do |doc|
+  doc.url 'https://my.url'
 end
 ```
 
@@ -432,6 +440,17 @@ You may add HTTP headers that Chromium will send when loading the HTML document:
 document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
   doc.url 'https://my.url'
   doc.extra_http_headers({'My-Header-1' => 'My value', 'My-Header-2' => 'My value'})
+end
+```
+
+#### Client Extra HTTP headers
+
+This method just duplicate way of passing headers into faraday client. Have same purpose:
+
+```ruby
+document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.url 'https://my.url'
+  doc.client_extra_http_headers({ 'Authorization': 'Bearer token123' })
 end
 ```
 

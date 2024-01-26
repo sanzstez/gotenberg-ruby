@@ -3,10 +3,11 @@ require 'faraday/multipart'
 
 module Gotenberg
   class Client
-    attr_reader :base_path
+    attr_reader :base_path, :headers
 
-    def initialize base_path
+    def initialize base_path, headers: {}
       @base_path = base_path
+      @headers = headers
     end
 
     def adapter
@@ -19,7 +20,7 @@ module Gotenberg
     end
 
     def default_headers
-      {'Content-Type' => 'multipart/form-data'}
+      {'Content-Type' => 'multipart/form-data'}.merge(headers)
     end
   end
 end

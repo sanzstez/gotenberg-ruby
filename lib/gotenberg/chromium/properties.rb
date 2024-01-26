@@ -83,7 +83,7 @@ module Gotenberg
         self
       end
  
-      # Overrides the default "User-Agent" header.
+      # DEPRECATED in Gotenberg 8. Overrides the default "User-Agent" header.
       def user_agent user_agent
         properties['userAgent'] = user_agent
 
@@ -92,7 +92,7 @@ module Gotenberg
 
       # Sets extra HTTP headers that Chromium will send when loading the HTML document.
       def extra_http_headers headers
-        properties['userAgent'] = headers.to_json
+        properties['extraHttpHeaders'] = headers.to_json
 
         self
       end
