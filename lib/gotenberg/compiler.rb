@@ -5,7 +5,7 @@ require 'gotenberg/analyzers/css'
 
 module Gotenberg
   class Compiler
-    CONTEXT_TAG_REGEX = /(<!-- GOTENBERG-CONTEXT-TAG (.+) -->)/.freeze
+    CONTEXT_TAG_REGEX = /(<!-- GOTENBERG-CONTEXT-TAG (.+?) -->)/.freeze
 
     attr_accessor :html
 
