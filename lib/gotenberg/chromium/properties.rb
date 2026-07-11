@@ -87,7 +87,15 @@ module Gotenberg
 
         self
       end
- 
+
+      # Waits for the network to be idle before converting an HTML document to PDF.
+      # https://gotenberg.dev/docs/routes#performance-mode-chromium
+      def wait_for_network_idle
+        properties['skipNetworkIdleEvent'] = false # default is true
+
+        self
+      end
+
       # DEPRECATED in Gotenberg 8. Overrides the default "User-Agent" header.
       def user_agent user_agent
         properties['userAgent'] = user_agent
@@ -108,7 +116,7 @@ module Gotenberg
 
         self
       end
- 
+
       # Forces Chromium to emulate the media type "print" or "screen".
       def emulate_media_type type
         properties['emulatedMediaType'] = type
@@ -140,7 +148,7 @@ module Gotenberg
       end
 
       private
- 
+
       def properties
         @properties ||= {}
       end
