@@ -37,10 +37,17 @@ version: "3"
 services:
   gotenberg:
     image: gotenberg/gotenberg:8
+    command:
+      - gotenberg
+      - --chromium-allow-file-access-from-files=true
     restart: always
     ports:
       - 3000:3000
 ```
+
+The `--chromium-allow-file-access-from-files=true` flag is required when converting HTML documents that use Vite
+CSS, ES modules, module preload imports, fonts, or images uploaded as multipart assets. Gotenberg opens these local
+assets through `file://` URLs, so Chromium must be allowed to load files from other local files.
 
 ### Send a request to the API
 
@@ -144,6 +151,74 @@ gotenberg_stylesheet_tag 'application.css', inline: true
 gotenberg_stylesheet_tag 'application.css', inline: true, skip_analyze: true
 ```
 
+Applications using `vite_rails` can load assets from the Vite manifest with dedicated helpers:
+
+```erb
+<%= gotenberg_vite_image_tag 'images/logo.svg' %>
+<%= gotenberg_vite_stylesheet_tag 'entrypoints/pdf.scss' %>
+<%= gotenberg_vite_javascript_tag 'entrypoints/pdf.js' %>
+```
+
+Each source must be present in the Vite manifest. These helpers only support local manifest assets and do not accept
+options such as `inline`, `absolute_path`, or `base_path`. Continue to use the regular Gotenberg helpers for external
+URLs and other options.
+
+##### Development Vite PDF build
+
+In development and test environments, Gotenberg needs production-style files instead of URLs from the Vite dev
+server. Add a dedicated watch command to `package.json`:
+
+```json
+{
+  "scripts": {
+    "vite:pdf:dev": "vite build --config vite.pdf.config.ts --mode development --watch"
+  }
+}
+```
+
+Run it alongside the Rails application:
+
+```bash
+npm run vite:pdf:dev
+```
+
+A minimal `vite.pdf.config.ts` for JavaScript and stylesheet PDF entrypoints looks like this:
+
+```ts
+import { defineConfig } from 'vite'
+import { resolve } from 'node:path'
+
+const root = resolve(__dirname, 'app/javascript')
+const entrypoint = (path: string) => resolve(root, path)
+
+export default defineConfig(({ mode }) => {
+  if (mode !== 'development') {
+    throw new Error(
+      'vite.pdf.config.ts is development-only. Use the main Vite build for production PDF assets.'
+    )
+  }
+
+  return {
+    root,
+    build: {
+      outDir: resolve(__dirname, 'tmp/vite-pdf'),
+      emptyOutDir: true,
+      manifest: true,
+      cssCodeSplit: true,
+      rollupOptions: {
+        input: {
+          'pdf.js': entrypoint('entrypoints/pdf.js'),
+          'pdf.css': entrypoint('entrypoints/pdf.scss'),
+        },
+      },
+    },
+  }
+})
+```
+
+This is a Vite build running in watch mode, not the Vite development server. The output directory must match
+`config.vite_output_dir`.
+
 #### Convert an HTML document to PDF
 
 See See https://gotenberg.dev/docs/routes#url-into-pdf-route.
@@ -205,8 +280,17 @@ Gotenberg.configure do |config|
 
   # default temporary directory for output
   config.backtrace_dir = Rails.root.join('tmp', 'gotenberg')
+
+  # development/test Vite PDF build output
+  config.vite_output_dir = 'tmp/vite-pdf'
+
+  # directory containing Vite source entrypoints
+  config.vite_source_code_dir = 'app/javascript'
 end
 ```
+
+The Vite options configure the dedicated PDF build used in development and test. Production uses the standard
+ViteRuby manifest and compiled assets from the configured public Vite output directory (by default, `public/vite`).
 
 #### Convert one or more markdown files to PDF
 
