@@ -6,11 +6,11 @@ PDF files, and more!
 
 This packages requires [Gotenberg](https://gotenberg.dev), a Docker-powered stateless API for PDF files:
 
-* 🔥 [Live Demo](https://gotenberg.dev/docs/get-started/live-demo)
-* [Docker](https://gotenberg.dev/docs/get-started/docker)
-* [Docker Compose](https://gotenberg.dev/docs/get-started/docker-compose)
-* [Kubernetes](https://gotenberg.dev/docs/get-started/kubernetes)
-* [Cloud Run](https://gotenberg.dev/docs/get-started/cloud-run)
+* 🔥 [Live Demo](https://gotenberg.dev/docs/getting-started/installation#live-demo)
+* [Docker](https://gotenberg.dev/docs/getting-started/installation#docker)
+* [Docker Compose](https://gotenberg.dev/docs/getting-started/installation#docker-compose)
+* [Kubernetes](https://gotenberg.dev/docs/getting-started/installation#kubernetes)
+* [Cloud Run](https://gotenberg.dev/docs/getting-started/installation#cloud-run)
 
 ## Installation
 
@@ -22,7 +22,7 @@ gem "gotenberg-ruby"
 
 * [Send a request to the API](#send-a-request-to-the-api)
 * [Chromium](#chromium)
-* [LibreOffice](#libreOffice)
+* [LibreOffice](#libreoffice)
 * [PDF Engines](#pdf-engines)
 * [Webhook](#webhook)
 * [Exiftools](#exiftools)
@@ -60,11 +60,11 @@ After having created the HTTP request (see below), you have two options:
 
 ### Chromium
 
-The [Chromium module](https://gotenberg.dev/docs/routes#convert-with-chromium) interacts with the Chromium browser to convert HTML documents to PDF.
+The [Chromium module](https://gotenberg.dev/docs/convert-with-chromium/convert-html-to-pdf) interacts with the Chromium browser to convert HTML documents to PDF.
 
 #### Convert a target URL to PDF
 
-See https://gotenberg.dev/docs/routes#url-into-pdf-route.
+See https://gotenberg.dev/docs/convert-with-chromium/convert-url-to-pdf.
 
 Converting a target URL to PDF is as simple as:
 
@@ -221,7 +221,7 @@ This is a Vite build running in watch mode, not the Vite development server. The
 
 #### Convert an HTML document to PDF
 
-See See https://gotenberg.dev/docs/routes#url-into-pdf-route.
+See https://gotenberg.dev/docs/convert-with-chromium/convert-html-to-pdf.
 
 Prepare HTML content with build-in Rails methods:
 
@@ -294,7 +294,7 @@ ViteRuby manifest and compiled assets from the configured public Vite output dir
 
 #### Convert one or more markdown files to PDF
 
-See https://gotenberg.dev/docs/routes#markdown-files-into-pdf-route.
+See https://gotenberg.dev/docs/convert-with-chromium/convert-markdown-to-pdf.
 
 You may convert markdown files with:
 
@@ -563,7 +563,7 @@ end
 
 #### PDF Format
 
-See https://gotenberg.dev/docs/routes#pdfa-chromium.
+See https://gotenberg.dev/docs/convert-with-chromium/convert-url-to-pdf#pdfa--pdfua.
 
 You may set the PDF format of the resulting PDF with:
 
@@ -576,12 +576,12 @@ end
 
 ### LibreOffice
 
-The [LibreOffice module](https://gotenberg.dev/docs/routes#convert-with-libreoffice) interacts with [LibreOffice](https://www.libreoffice.org/) 
+The [LibreOffice module](https://gotenberg.dev/docs/convert-with-libreoffice/convert-to-pdf) interacts with [LibreOffice](https://www.libreoffice.org/)
 to convert documents to PDF, thanks to [unoconv](https://github.com/unoconv/unoconv).
 
 #### Convert documents to PDF
 
-See https://gotenberg.dev/docs/routes#office-documents-into-pdfs-route.
+See https://gotenberg.dev/docs/convert-with-libreoffice/convert-to-pdf.
 
 Converting a document to PDF is as simple as:
 
@@ -641,7 +641,7 @@ end
 
 #### PDF format
 
-See https://gotenberg.dev/docs/routes#pdfa-libreoffice.
+See https://gotenberg.dev/docs/convert-with-libreoffice/convert-to-pdf#pdfa--pdfua.
 
 You may set the PDF format of the resulting PDF(s) with:
 
@@ -670,7 +670,7 @@ The [PDF Engines module](https://gotenberg.dev/docs/configuration#pdf-engines) g
 
 #### Merge PDFs
 
-See https://gotenberg.dev/docs/routes#merge-pdfs-route.
+See https://gotenberg.dev/docs/manipulate-pdfs/merge-pdfs.
 
 Merging PDFs is as simple as:
 
@@ -693,7 +693,7 @@ end
 
 #### Convert to a specific PDF format
 
-See https://gotenberg.dev/docs/routes#convert-into-pdfa--pdfua-route.
+See https://gotenberg.dev/docs/manipulate-pdfs/pdfa-pdfua.
 
 You may convert a PDF to a specific PDF format with:
 
@@ -718,7 +718,7 @@ end
 
 ### Webhook
 
-The [Webhook module](https://gotenberg.dev/docs/webhook) is a Gotenberg middleware that sends the API
+The [Webhook module](https://gotenberg.dev/docs/webhook-download#webhooks) is a Gotenberg middleware that sends the API
 responses to callbacks.
 
 ⚠️ You cannot use the `document.to_binary` method if you're using the webhook feature.
