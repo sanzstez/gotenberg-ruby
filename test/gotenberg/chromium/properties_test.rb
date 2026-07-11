@@ -22,8 +22,6 @@ class ChromiumPropertiesTest < Minitest::Test
   end
 
   def test_wait_for_network_almost_idle_enables_network_almost_idle_wait
-    skip 'Implemented after merging strict network idle support'
-
     result = @document.wait_for_network_almost_idle
 
     assert_same @document, result

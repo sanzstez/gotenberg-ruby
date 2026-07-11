@@ -88,10 +88,20 @@ module Gotenberg
         self
       end
 
-      # Waits for the network to be idle before converting an HTML document to PDF.
-      # https://gotenberg.dev/docs/routes#performance-mode-chromium
+      # Waits until no network connections remain active for 500ms.
+      # Avoid this for long polling or WebSockets, which may prevent network idle.
+      # See https://gotenberg.dev/docs/convert-with-chromium/convert-html-to-pdf#network-errors.
       def wait_for_network_idle
-        properties['skipNetworkIdleEvent'] = false # default is true
+        properties['skipNetworkIdleEvent'] = false
+
+        self
+      end
+
+      # Waits until at most two network connections remain active for 500ms.
+      # Prefer this for long polling, WebSockets, analytics, or heartbeat requests.
+      # See https://gotenberg.dev/docs/convert-with-chromium/convert-html-to-pdf#network-errors.
+      def wait_for_network_almost_idle
+        properties['skipNetworkAlmostIdleEvent'] = false
 
         self
       end

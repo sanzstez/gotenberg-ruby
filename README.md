@@ -505,6 +505,31 @@ document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
 end
 ```
 
+#### Wait for network idle
+
+By default, Gotenberg does not wait for network activity to settle before converting a document. You may wait until no
+network connections remain active for 500ms:
+
+```ruby
+document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.html index_html
+  doc.wait_for_network_idle
+end
+```
+
+Strict network idle may never occur on pages using long polling, WebSockets, analytics, or heartbeat requests. For these
+pages, wait until at most two network connections remain active for 500ms instead:
+
+```ruby
+document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.html index_html
+  doc.wait_for_network_almost_idle
+end
+```
+
+Do not combine both methods unless strict network idle is required: when both are enabled, Gotenberg waits for both
+events. See the [Gotenberg network errors documentation](https://gotenberg.dev/docs/convert-with-chromium/convert-html-to-pdf#network-errors).
+
 #### User agent
 
 You may override the default `User-Agent` header used by Gotenberg:
