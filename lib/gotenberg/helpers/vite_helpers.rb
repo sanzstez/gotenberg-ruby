@@ -87,16 +87,14 @@ module Gotenberg
 
       def gotenberg_vite_manifest
         if Rails.env.development? || Rails.env.test?
-          manifest = gotenberg_vite_pdf_manifest
-          manifest.refresh
-          manifest
+          @gotenberg_vite_manifest ||= vite_internal_manifest.tap(&:refresh)
         else
           vite_manifest
         end
       end
 
-      def gotenberg_vite_pdf_manifest
-        @gotenberg_vite_pdf_manifest ||= ViteRuby.new(
+      def vite_internal_manifest
+        @vite_internal_manifest ||= ViteRuby.new(
           root: Rails.root.to_s,
           mode: 'production',
           public_dir: '.',
