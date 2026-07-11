@@ -28,7 +28,8 @@ module Gotenberg
 
       def analyze_binary
         binary.gsub!(ASSETS_REGEX) do
-          resource_src = File.join(resource[:base_path], $1)
+          resource_path = $1.sub(/[?#].*\z/, '')
+          resource_src = File.join(resource[:base_path], resource_path)
 
           analyzer =
             Analyzers::Resource.new(resource.merge(src: resource_src)).call
