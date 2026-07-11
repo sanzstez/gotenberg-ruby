@@ -2,6 +2,8 @@ require 'json'
 require 'gotenberg/analyzers/image'
 require 'gotenberg/analyzers/js'
 require 'gotenberg/analyzers/css'
+require 'gotenberg/analyzers/module_js'
+require 'gotenberg/analyzers/module_preload'
 
 module Gotenberg
   class Compiler
@@ -35,6 +37,10 @@ module Gotenberg
             Analyzers::Js.new(resource).call
           when 'css'
             Analyzers::Css.new(resource).call
+          when 'modulejs'
+            Analyzers::ModuleJs.new(resource).call
+          when 'modulepreload'
+            Analyzers::ModulePreload.new(resource).call
           end
 
         assets.push(*analyzer.assets)

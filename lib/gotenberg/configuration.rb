@@ -1,6 +1,6 @@
 module Gotenberg
   class Configuration
-    attr_accessor :backtrace_dir, :html_debug
+    attr_accessor :backtrace_dir, :html_debug, :vite_output_dir, :vite_source_code_dir
 
     def initialize
       @backtrace_dir =
@@ -9,6 +9,9 @@ module Gotenberg
         else
           Dir.mktmpdir
         end
+
+      @vite_output_dir = 'tmp/vite-pdf'
+      @vite_source_code_dir = 'app/javascript'
 
       @html_debug = false
     end
