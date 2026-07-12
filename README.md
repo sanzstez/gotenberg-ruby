@@ -4,13 +4,19 @@ PDF files, and more!
 
 ## Requirement
 
+⚠️ Gotenberg Ruby requires Gotenberg 8.3.0 or newer.
+
+Native PDF metadata support was added in [Gotenberg 8.3.0](https://github.com/gotenberg/gotenberg/releases/tag/v8.3.0).
+See the official [Chromium metadata documentation](https://gotenberg.dev/docs/convert-with-chromium/convert-html-to-pdf#metadata-pdf-engines)
+for details.
+
 This packages requires [Gotenberg](https://gotenberg.dev), a Docker-powered stateless API for PDF files:
 
-* 🔥 [Live Demo](https://gotenberg.dev/docs/get-started/live-demo)
-* [Docker](https://gotenberg.dev/docs/get-started/docker)
-* [Docker Compose](https://gotenberg.dev/docs/get-started/docker-compose)
-* [Kubernetes](https://gotenberg.dev/docs/get-started/kubernetes)
-* [Cloud Run](https://gotenberg.dev/docs/get-started/cloud-run)
+* 🔥 [Live Demo](https://gotenberg.dev/docs/getting-started/installation#live-demo)
+* [Docker](https://gotenberg.dev/docs/getting-started/installation#docker)
+* [Docker Compose](https://gotenberg.dev/docs/getting-started/installation#docker-compose)
+* [Kubernetes](https://gotenberg.dev/docs/getting-started/installation#kubernetes)
+* [Cloud Run](https://gotenberg.dev/docs/getting-started/installation#cloud-run)
 
 ## Installation
 
@@ -22,10 +28,9 @@ gem "gotenberg-ruby"
 
 * [Send a request to the API](#send-a-request-to-the-api)
 * [Chromium](#chromium)
-* [LibreOffice](#libreOffice)
+* [LibreOffice](#libreoffice)
 * [PDF Engines](#pdf-engines)
 * [Webhook](#webhook)
-* [Exiftools](#exiftools)
 
 ### Run Gotenberg
 
@@ -37,10 +42,17 @@ version: "3"
 services:
   gotenberg:
     image: gotenberg/gotenberg:8
+    command:
+      - gotenberg
+      - --chromium-allow-file-access-from-files=true
     restart: always
     ports:
       - 3000:3000
 ```
+
+The `--chromium-allow-file-access-from-files=true` flag is required when converting HTML documents that use Vite
+CSS, ES modules, module preload imports, fonts, or images uploaded as multipart assets. Gotenberg opens these local
+assets through `file://` URLs, so Chromium must be allowed to load files from other local files.
 
 ### Send a request to the API
 
@@ -53,11 +65,11 @@ After having created the HTTP request (see below), you have two options:
 
 ### Chromium
 
-The [Chromium module](https://gotenberg.dev/docs/routes#convert-with-chromium) interacts with the Chromium browser to convert HTML documents to PDF.
+The [Chromium module](https://gotenberg.dev/docs/convert-with-chromium/convert-html-to-pdf) interacts with the Chromium browser to convert HTML documents to PDF.
 
 #### Convert a target URL to PDF
 
-See https://gotenberg.dev/docs/routes#url-into-pdf-route.
+See https://gotenberg.dev/docs/convert-with-chromium/convert-url-to-pdf.
 
 Converting a target URL to PDF is as simple as:
 
@@ -98,9 +110,6 @@ Available exceptions:
 ```ruby
 # raise while PDF transform failed
 Gotenberg::TransformError
-
-# raise while change PDF metadata failed
-Gotenberg::ModifyMetadataError
 
 # raise while loading asset source failed
 Gotenberg::RemoteSourceError
@@ -144,9 +153,77 @@ gotenberg_stylesheet_tag 'application.css', inline: true
 gotenberg_stylesheet_tag 'application.css', inline: true, skip_analyze: true
 ```
 
+Applications using `vite_rails` can load assets from the Vite manifest with dedicated helpers:
+
+```erb
+<%= gotenberg_vite_image_tag 'images/logo.svg' %>
+<%= gotenberg_vite_stylesheet_tag 'entrypoints/pdf.scss' %>
+<%= gotenberg_vite_javascript_tag 'entrypoints/pdf.js' %>
+```
+
+Each source must be present in the Vite manifest. These helpers only support local manifest assets and do not accept
+options such as `inline`, `absolute_path`, or `base_path`. Continue to use the regular Gotenberg helpers for external
+URLs and other options.
+
+##### Development Vite PDF build
+
+In development and test environments, Gotenberg needs production-style files instead of URLs from the Vite dev
+server. Add a dedicated watch command to `package.json`:
+
+```json
+{
+  "scripts": {
+    "vite:pdf:dev": "vite build --config vite.pdf.config.ts --mode development --watch"
+  }
+}
+```
+
+Run it alongside the Rails application:
+
+```bash
+npm run vite:pdf:dev
+```
+
+A minimal `vite.pdf.config.ts` for JavaScript and stylesheet PDF entrypoints looks like this:
+
+```ts
+import { defineConfig } from 'vite'
+import { resolve } from 'node:path'
+
+const root = resolve(__dirname, 'app/javascript')
+const entrypoint = (path: string) => resolve(root, path)
+
+export default defineConfig(({ mode }) => {
+  if (mode !== 'development') {
+    throw new Error(
+      'vite.pdf.config.ts is development-only. Use the main Vite build for production PDF assets.'
+    )
+  }
+
+  return {
+    root,
+    build: {
+      outDir: resolve(__dirname, 'tmp/vite-pdf'),
+      emptyOutDir: true,
+      manifest: true,
+      cssCodeSplit: true,
+      rollupOptions: {
+        input: {
+          'pdf.js': entrypoint('entrypoints/pdf.js'),
+          'pdf.css': entrypoint('entrypoints/pdf.scss'),
+        },
+      },
+    },
+  }
+})
+```
+
+This is a Vite build running in watch mode, not the Vite development server. The output directory must match
+`config.vite_output_dir`.
+
 #### Convert an HTML document to PDF
 
-See See https://gotenberg.dev/docs/routes#url-into-pdf-route.
+See https://gotenberg.dev/docs/convert-with-chromium/convert-html-to-pdf.
 
 Prepare HTML content with build-in Rails methods:
 
@@ -176,25 +253,27 @@ document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
 end
 ```
 
-#### Change PDF meta with exiftools
-
-If you want to use this feature, you need to install additional package to host system:
-
-```
-sudo apt install exiftool
-```
-
- and now you can change PDF metatags using exiftools:
+#### PDF metadata
 
 ```ruby
 document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
   doc.html index_html
-  doc.meta title: 'Custom PDF title'
+  doc.meta(
+    'Title' => 'Quarterly Report',
+    'Author' => 'Jane Doe',
+    'Subject' => 'Quarterly business results',
+    'Keywords' => ['quarterly', 'business', 'report']
+  )
 end
 ```
 
-Note: for Rails based apps, you can setup <title>Custom PDF title</title> header in index.html and
-it will be automatically added to output PDF.
+Metadata keys correspond to ExifTool tag names. Canonical capitalization is recommended, although lowercase and
+symbol keys are also supported. Do not provide the same tag more than once with different casing. Not every ExifTool
+tag is writable; see the full [ExifTool XMP Tags](https://exiftool.org/TagNames/XMP.html) reference and the
+[Gotenberg metadata documentation](https://gotenberg.dev/docs/manipulate-pdfs/write-metadata) for more examples.
+
+Writing metadata usually breaks PDF/A compliance. Without an explicit `Title`, Chromium uses the HTML `<title>`;
+pass an empty `Title` to clear it.
 
 #### Configuration file (optionally)
 
@@ -205,12 +284,21 @@ Gotenberg.configure do |config|
 
   # default temporary directory for output
   config.backtrace_dir = Rails.root.join('tmp', 'gotenberg')
+
+  # development/test Vite PDF build output
+  config.vite_output_dir = 'tmp/vite-pdf'
+
+  # directory containing Vite source entrypoints
+  config.vite_source_code_dir = 'app/javascript'
 end
 ```
 
+The Vite options configure the dedicated PDF build used in development and test. Production uses the standard
+ViteRuby manifest and compiled assets from the configured public Vite output directory (by default, `public/vite`).
+
 #### Convert one or more markdown files to PDF
 
-See https://gotenberg.dev/docs/routes#markdown-files-into-pdf-route.
+See https://gotenberg.dev/docs/convert-with-chromium/convert-markdown-to-pdf.
 
 You may convert markdown files with:
 
@@ -421,6 +509,31 @@ document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
 end
 ```
 
+#### Wait for network idle
+
+By default, Gotenberg does not wait for network activity to settle before converting a document. You may wait until no
+network connections remain active for 500ms:
+
+```ruby
+document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.html index_html
+  doc.wait_for_network_idle
+end
+```
+
+Strict network idle may never occur on pages using long polling, WebSockets, analytics, or heartbeat requests. For these
+pages, wait until at most two network connections remain active for 500ms instead:
+
+```ruby
+document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
+  doc.html index_html
+  doc.wait_for_network_almost_idle
+end
+```
+
+Do not combine both methods unless strict network idle is required: when both are enabled, Gotenberg waits for both
+events. See the [Gotenberg network errors documentation](https://gotenberg.dev/docs/convert-with-chromium/convert-html-to-pdf#network-errors).
+
 #### User agent
 
 You may override the default `User-Agent` header used by Gotenberg:
@@ -479,7 +592,7 @@ end
 
 #### PDF Format
 
-See https://gotenberg.dev/docs/routes#pdfa-chromium.
+See https://gotenberg.dev/docs/convert-with-chromium/convert-url-to-pdf#pdfa--pdfua.
 
 You may set the PDF format of the resulting PDF with:
 
@@ -492,12 +605,12 @@ end
 
 ### LibreOffice
 
-The [LibreOffice module](https://gotenberg.dev/docs/routes#convert-with-libreoffice) interacts with [LibreOffice](https://www.libreoffice.org/) 
+The [LibreOffice module](https://gotenberg.dev/docs/convert-with-libreoffice/convert-to-pdf) interacts with [LibreOffice](https://www.libreoffice.org/)
 to convert documents to PDF, thanks to [unoconv](https://github.com/unoconv/unoconv).
 
 #### Convert documents to PDF
 
-See https://gotenberg.dev/docs/routes#office-documents-into-pdfs-route.
+See https://gotenberg.dev/docs/convert-with-libreoffice/convert-to-pdf.
 
 Converting a document to PDF is as simple as:
 
@@ -557,7 +670,7 @@ end
 
 #### PDF format
 
-See https://gotenberg.dev/docs/routes#pdfa-libreoffice.
+See https://gotenberg.dev/docs/convert-with-libreoffice/convert-to-pdf#pdfa--pdfua.
 
 You may set the PDF format of the resulting PDF(s) with:
 
@@ -586,7 +699,7 @@ The [PDF Engines module](https://gotenberg.dev/docs/configuration#pdf-engines) g
 
 #### Merge PDFs
 
-See https://gotenberg.dev/docs/routes#merge-pdfs-route.
+See https://gotenberg.dev/docs/manipulate-pdfs/merge-pdfs.
 
 Merging PDFs is as simple as:
 
@@ -609,7 +722,7 @@ end
 
 #### Convert to a specific PDF format
 
-See https://gotenberg.dev/docs/routes#convert-into-pdfa--pdfua-route.
+See https://gotenberg.dev/docs/manipulate-pdfs/pdfa-pdfua.
 
 You may convert a PDF to a specific PDF format with:
 
@@ -634,7 +747,7 @@ end
 
 ### Webhook
 
-The [Webhook module](https://gotenberg.dev/docs/webhook) is a Gotenberg middleware that sends the API
+The [Webhook module](https://gotenberg.dev/docs/webhook-download#webhooks) is a Gotenberg middleware that sends the API
 responses to callbacks.
 
 ⚠️ You cannot use the `document.to_binary` method if you're using the webhook feature.
@@ -668,19 +781,3 @@ document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
   doc.webhook 'https://my.webhook.url', 'https://my.webhook.error.url'
 end
 ```
-
-### Exiftools
-
-Gem also proxify (expert mode) access to mini_exiftools througth *Gotenberg::Exiftools* class.
-You can change PDF metadata manually:
-
-```ruby
-binary = Gotenberg::Exiftools.modify(pdf_binary, { title: 'Document 1' })
-
-# save PDF file
-File.open('filename.pdf', 'wb') do |file|
-  file << binary
-end
-```
-
-⚠️ Class is just wrapper around *MiniExiftool* class, so you need handle exceptions manually/carefully in begin/rescue block.

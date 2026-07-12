@@ -29,8 +29,6 @@ module Gotenberg
       def html index
         compiler = Compiler.new(index)
 
-        meta(extract_metadata_from_body(compiler.body))
-
         files << multipart_file(compiler.body, 'index.html', 'text/html')
 
         assets *compiler.assets

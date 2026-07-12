@@ -87,7 +87,25 @@ module Gotenberg
 
         self
       end
- 
+
+      # Waits until no network connections remain active for 500ms.
+      # Avoid this for long polling or WebSockets, which may prevent network idle.
+      # See https://gotenberg.dev/docs/convert-with-chromium/convert-html-to-pdf#network-errors.
+      def wait_for_network_idle
+        properties['skipNetworkIdleEvent'] = false
+
+        self
+      end
+
+      # Waits until at most two network connections remain active for 500ms.
+      # Prefer this for long polling, WebSockets, analytics, or heartbeat requests.
+      # See https://gotenberg.dev/docs/convert-with-chromium/convert-html-to-pdf#network-errors.
+      def wait_for_network_almost_idle
+        properties['skipNetworkAlmostIdleEvent'] = false
+
+        self
+      end
+
       # DEPRECATED in Gotenberg 8. Overrides the default "User-Agent" header.
       def user_agent user_agent
         properties['userAgent'] = user_agent
@@ -108,7 +126,7 @@ module Gotenberg
 
         self
       end
- 
+
       # Forces Chromium to emulate the media type "print" or "screen".
       def emulate_media_type type
         properties['emulatedMediaType'] = type
@@ -140,7 +158,7 @@ module Gotenberg
       end
 
       private
- 
+
       def properties
         @properties ||= {}
       end

@@ -4,14 +4,12 @@ require 'gotenberg/headers'
 require 'gotenberg/metadata'
 require 'gotenberg/files'
 require 'gotenberg/client'
-require 'gotenberg/exiftools'
-require 'gotenberg/extractors'
 require 'gotenberg/exceptions'
 require 'gotenberg/backtrace'
 
 module Gotenberg
   class Chromium
-    include Properties, Files, Headers, Metadata, Tools, Extractors
+    include Properties, Files, Headers, Metadata, Tools
 
     attr_accessor :base_path, :client_headers
     attr_reader :endpoint, :response, :exception
@@ -31,7 +29,6 @@ module Gotenberg
     def call
       backtrace if html_debug?
       transform
-      modify_metadata if modify_metadata?
 
       self
     end
@@ -46,12 +43,6 @@ module Gotenberg
 
     private
 
-    def modify_metadata?
-      return false if webhook_request?
-
-      success? && metadata_available?
-    end
-
     def html_debug?
       Gotenberg.configuration.html_debug == true
     end
@@ -64,12 +55,6 @@ module Gotenberg
       @response = client.adapter.post(endpoint, properties.merge(files: files), headers).body
     rescue StandardError => e
       @exception = Gotenberg::TransformError.new(e)
-    end
-
-    def modify_metadata
-      @response = Exiftools.modify(response, metadata)
-    rescue StandardError => e
-      @exception = Gotenberg::ModifyMetadataError.new(e)
     end
 
     def client

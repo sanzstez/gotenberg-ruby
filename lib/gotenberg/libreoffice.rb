@@ -4,7 +4,6 @@ require 'gotenberg/headers'
 require 'gotenberg/metadata'
 require 'gotenberg/files'
 require 'gotenberg/client'
-require 'gotenberg/exiftools'
 require 'gotenberg/exceptions'
 
 module Gotenberg
@@ -28,7 +27,6 @@ module Gotenberg
 
     def call
       transform
-      modify_metadata if modify_metadata?
 
       self
     end
@@ -43,23 +41,10 @@ module Gotenberg
 
     private
 
-    def modify_metadata?
-      return false if webhook_request?
-      return false if zip_mode?
-
-      success? && metadata_available?
-    end
-
     def transform
       @response = client.adapter.post(endpoint, properties.merge(files: files), headers).body
     rescue StandardError => e
       @exception = Gotenberg::TransformError.new(e)
-    end
-
-    def modify_metadata
-      @response = Exiftools.modify(response, metadata)
-    rescue StandardError => e
-      @exception = Gotenberg::ModifyMetadataError.new(e)
     end
 
     def client

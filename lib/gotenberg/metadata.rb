@@ -1,17 +1,15 @@
+require 'json'
+
 module Gotenberg
   module Metadata
-    # set meta headers for PDF file with exiftools (title, creator, etc...)
     def meta elements
       metadata.merge!(elements)
+      properties['metadata'] = metadata.to_json unless metadata.empty?
 
       self
     end
 
     private
-
-    def metadata_available?
-      !metadata.empty?
-    end
 
     def metadata
       @metadata ||= {}

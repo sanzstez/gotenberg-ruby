@@ -45,7 +45,7 @@ module Gotenberg
             EOF
         end
 
-        Rails.env.development? ? :proxy : :static
+        (Rails.env.development? || Rails.env.test?) ? :proxy : :static
       end
 
       def gotenberg_source_location source, options = {}

@@ -13,8 +13,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'faraday', '>= 2.0.0'
   s.add_dependency 'faraday-multipart', '>= 1.0.4'
-  s.add_dependency 'mini_exiftool', '>= 1.0.0'
   s.add_dependency 'launchy', '>= 2.2'
 
-  s.files = Dir['lib/**/*', 'README.md', 'LICENSE.md']
+  s.files = Dir['lib/**/*', 'README.md', 'CHANGELOG.md', 'LICENSE.md']
 end
