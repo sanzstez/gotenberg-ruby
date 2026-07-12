@@ -4,6 +4,12 @@ PDF files, and more!
 
 ## Requirement
 
+⚠️ Gotenberg Ruby requires Gotenberg 8.3.0 or newer.
+
+Native PDF metadata support was added in [Gotenberg 8.3.0](https://github.com/gotenberg/gotenberg/releases/tag/v8.3.0).
+See the official [Chromium metadata documentation](https://gotenberg.dev/docs/convert-with-chromium/convert-html-to-pdf#metadata-pdf-engines)
+for details.
+
 This packages requires [Gotenberg](https://gotenberg.dev), a Docker-powered stateless API for PDF files:
 
 * 🔥 [Live Demo](https://gotenberg.dev/docs/getting-started/installation#live-demo)
@@ -25,7 +31,6 @@ gem "gotenberg-ruby"
 * [LibreOffice](#libreoffice)
 * [PDF Engines](#pdf-engines)
 * [Webhook](#webhook)
-* [Exiftools](#exiftools)
 
 ### Run Gotenberg
 
@@ -105,9 +110,6 @@ Available exceptions:
 ```ruby
 # raise while PDF transform failed
 Gotenberg::TransformError
-
-# raise while change PDF metadata failed
-Gotenberg::ModifyMetadataError
 
 # raise while loading asset source failed
 Gotenberg::RemoteSourceError
@@ -251,25 +253,27 @@ document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
 end
 ```
 
-#### Change PDF meta with exiftools
-
-If you want to use this feature, you need to install additional package to host system:
-
-```
-sudo apt install exiftool
-```
-
- and now you can change PDF metatags using exiftools:
+#### PDF metadata
 
 ```ruby
 document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
   doc.html index_html
-  doc.meta title: 'Custom PDF title'
+  doc.meta(
+    'Title' => 'Quarterly Report',
+    'Author' => 'Jane Doe',
+    'Subject' => 'Quarterly business results',
+    'Keywords' => ['quarterly', 'business', 'report']
+  )
 end
 ```
 
-Note: for Rails based apps, you can setup <title>Custom PDF title</title> header in index.html and
-it will be automatically added to output PDF.
+Metadata keys correspond to ExifTool tag names. Canonical capitalization is recommended, although lowercase and
+symbol keys are also supported. Do not provide the same tag more than once with different casing. Not every ExifTool
+tag is writable; see the full [ExifTool XMP Tags](https://exiftool.org/TagNames/XMP.html) reference and the
+[Gotenberg metadata documentation](https://gotenberg.dev/docs/manipulate-pdfs/write-metadata) for more examples.
+
+Writing metadata usually breaks PDF/A compliance. Without an explicit `Title`, Chromium uses the HTML `<title>`;
+pass an empty `Title` to clear it.
 
 #### Configuration file (optionally)
 
@@ -777,19 +781,3 @@ document = Gotenberg::Chromium.call(ENV['GOTENBERG_URL']) do |doc|
   doc.webhook 'https://my.webhook.url', 'https://my.webhook.error.url'
 end
 ```
-
-### Exiftools
-
-Gem also proxify (expert mode) access to mini_exiftools througth *Gotenberg::Exiftools* class.
-You can change PDF metadata manually:
-
-```ruby
-binary = Gotenberg::Exiftools.modify(pdf_binary, { title: 'Document 1' })
-
-# save PDF file
-File.open('filename.pdf', 'wb') do |file|
-  file << binary
-end
-```
-
-⚠️ Class is just wrapper around *MiniExiftool* class, so you need handle exceptions manually/carefully in begin/rescue block.
