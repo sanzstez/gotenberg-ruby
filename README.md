@@ -115,6 +115,21 @@ Gotenberg::TransformError
 Gotenberg::RemoteSourceError
 ```
 
+HTTP response details are available on transform errors:
+
+```ruby
+error = document.exception
+
+error.original_error
+error.response
+error.response_status
+error.response_headers
+error.response_body
+```
+
+The response values are `nil` when the request failed before receiving an HTTP
+response.
+
 You may inject `<link>` and `<script>` HTML elements thanks to the `extra_link_tags` and `extra_script_tags` arguments:
 
 ```ruby
